@@ -1,0 +1,2 @@
+  (write-lalr-actions cpp-mach (xtra-dir "cpp-act.scm") #:prefix "cpp-")
+  (write-lalr-tables cpp-mach (xtra-dir "cpp-tab.scm") #:prefix "cpp-"))

@@ -14,17 +14,30 @@ MES_STACK=6000000
 MES=${BINDIR}/mes-m2
 LIBDIR=${MES_PREFIX}/lib
 
-if match ${ARCH} x86; then
-    MES_ARCH=x86
-    ARCH_BITS=32
+if match ${ARCH} aarch64; then
+    MES_ARCH=arm
+    ARCH_BITS=64
+    BASE_ADDRESS=0x00400000
 fi
 if match ${ARCH} amd64; then
     MES_ARCH=x86_64
     ARCH_BITS=64
+    BASE_ADDRESS=0x00400000
+fi
+if match ${ARCH} riscv32; then
+    MES_ARCH=riscv32
+    ARCH_BITS=32
+    BASE_ADDRESS=0x00600000
 fi
 if match ${ARCH} riscv64; then
     MES_ARCH=riscv64
     ARCH_BITS=64
+    BASE_ADDRESS=0x00600000
+fi
+if match ${ARCH} x86; then
+    MES_ARCH=x86
+    ARCH_BITS=32
+    BASE_ADDRESS=0x08048000
 fi
 
 # Check tarball checksums
@@ -34,12 +47,12 @@ sha256sum -c sources.SHA256SUM
 # Unpack
 mkdir build
 cd build
-ungz --file ${DISTFILES}/${NYACC_PKG}-lb1.tar.gz --output ${NYACC_PKG}.tar
+ungz --file ${DISTFILES}/${NYACC_PKG}.tar.gz --output ${NYACC_PKG}.tar
 ungz --file ${DISTFILES}/${MES_PKG}.tar.gz --output ${MES_PKG}.tar
 untar --file ${NYACC_PKG}.tar
 untar --non-strict --file ${MES_PKG}.tar # ignore symlinks
 mes_run=${MES_PREFIX}/kaem.run
-replace --file ${mes_run} --output ${mes_run} --match-on 0x1000000 --replace-with 0x8048000
+replace --file ${mes_run} --output ${mes_run} --match-on 0x1000000 --replace-with ${BASE_ADDRESS}
 
 rm ${NYACC_PKG}.tar ${MES_PKG}.tar
 
@@ -48,6 +61,27 @@ cp ../files/config.h ${MES_PREFIX}/include/mes
 # This patch was upstreamed after mes 0.27.1
 simple-patch ${MES_PREFIX}/lib/linux/wait4.c \
     ../simple-patches/wait4.before ../simple-patches/wait4.after
+
+#mkdir ${NYACC_PKG}/rnrs
+#mkdir ${NYACC_PKG}/rnrs/arithmetic
+#cp ../files/bitwise.scm ${NYACC_PKG}/rnrs/arithmetic
+#mkdir ${NYACC_PKG}/system
+#cp ../files/foreign.scm ${NYACC_PKG}/system
+cp ../files/gen-c99-files.scm ${NYACC_PKG}
+cp ../files/gen-c99cx-files.scm ${NYACC_PKG}
+cp ../files/gen-cpp-files.scm ${NYACC_PKG} 
+simple-patch ${NYACC_PKG}/module/nyacc/lalr.scm \
+    ../simple-patches/lalr-datum.before ../simple-patches/lalr-datum.after
+simple-patch ${NYACC_PKG}/module/nyacc/lalr.scm \
+    ../simple-patches/lalr-macro.before ../simple-patches/lalr-macro.after
+simple-patch ${NYACC_PKG}/module/nyacc/lang/c99/cppmach.scm \
+    ../simple-patches/cppmach.before ../simple-patches/cppmach.after
+simple-patch ${NYACC_PKG}/module/nyacc/lang/c99/cxmach.scm \
+    ../simple-patches/cxmach.before ../simple-patches/cxmach.after
+simple-patch ${NYACC_PKG}/module/nyacc/lang/c99/mach.scm \
+    ../simple-patches/mach.before ../simple-patches/mach.after
+simple-patch ${NYACC_PKG}/module/nyacc/util.scm \
+    ../simple-patches/util.before ../simple-patches/util.after
 
 cd ${MES_PREFIX}
 mkdir include/arch

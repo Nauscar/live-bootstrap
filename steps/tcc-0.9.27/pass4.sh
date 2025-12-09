@@ -10,11 +10,32 @@ src_prepare() {
 }
 
 src_compile() {
+    if match ${ARCH} aarch64; then
+        TCC_TARGET_ARCH=ARM64
+        LIB_ARM64=true
+    fi
+    if match ${ARCH} amd64; then
+        TCC_TARGET_ARCH=X86_64
+        LIB_ARM64=false
+    fi
+    if match ${ARCH} riscv32; then
+        TCC_TARGET_ARCH=RISCV32
+        LIB_ARM64=false
+    fi
+    if match ${ARCH} riscv64; then
+        TCC_TARGET_ARCH=RISCV64
+        LIB_ARM64=true
+    fi
+    if match ${ARCH} x86; then
+        TCC_TARGET_ARCH=I386
+        LIB_ARM64=false
+    fi
+
     tcc-musl \
         -v \
         -static \
         -o tcc-musl \
-        -D TCC_TARGET_I386=1 \
+        -D TCC_TARGET_${TCC_TARGET_ARCH}=1 \
         -D CONFIG_TCCDIR=\""${LIBDIR}/tcc"\" \
         -D CONFIG_TCC_CRTPREFIX=\""${LIBDIR}"\" \
         -D CONFIG_TCC_ELFINTERP=\"/musl/loader\" \
@@ -29,7 +50,12 @@ src_compile() {
 
     # libtcc1.a
     tcc-musl -c -D HAVE_CONFIG_H=1 lib/libtcc1.c
-    tcc-musl -ar cr libtcc1.a libtcc1.o
+    if match ${LIB_ARM64} true; then
+        tcc-musl -c -D HAVE_CONFIG_H=1 lib/lib-arm64.c
+        tcc-musl -ar cr libtcc1.a libtcc1.o lib-arm64.o
+    else
+        tcc-musl -ar cr libtcc1.a libtcc1.o
+    fi
 }
 
 src_install() {

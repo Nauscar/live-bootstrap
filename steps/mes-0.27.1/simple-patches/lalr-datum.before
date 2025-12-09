@@ -1,0 +1,1 @@
+  (eqv? #\$ (string-ref (symbol->string (syntax->datum grammar-symbol)) 0)))

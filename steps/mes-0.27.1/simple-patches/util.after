@@ -1,0 +1,11 @@
+            vector-map vector-for-each vector-any vector-fold))
+(cond-expand
+ (mes
+  (define (string-every chr str)
+    (let loop ((k 0))
+      (if (>= k (string-length str))
+          #t
+          (if (char=? (string-ref str k) chr)
+              (loop (+ k 1))
+              #f)))))
+ (else))

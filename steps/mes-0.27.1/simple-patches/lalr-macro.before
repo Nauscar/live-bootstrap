@@ -1,0 +1,7 @@
+  (define-macro (wrap-term term)
+    `(cons (quote ,(if (symbol? term)
+                       (if (reserved? term)
+                           'terminal
+                           'non-terminal)
+                       'non-terminal))
+           (quote ,term))))

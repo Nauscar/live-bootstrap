@@ -219,19 +219,19 @@ From this point until musl, we are capable of making non-standard and strange
 libraries. All libraries are in ``/usr/lib/mes``, and includes are in
 ``/usr/include/mes``, as they are incompatible with musl.
 
-tinycc 0.9.26
+bootstrappable tinycc 0.9.27
 =============
 
 ``tinycc`` is a minimal C compiler that aims to be small and fast. It
 complies with all C89 and most of C99 standards.
 
-First, we compile janneke’s fork of tcc 0.9.26 using ``mescc``,
-containing 27 patches to make it operate well in the bootstrap
+First, we compile janneke’s bootstrappable fork of tcc using ``mescc``,
+containing 12 patches to make it operate well in the bootstrap
 environment and make it compilable using ``mescc``. This is a
 non-trivial process and as seen within tcc. kaem has many different parts
-within it: a. tcc 0.9.26 is first compiled using ``mescc``. b. The mes
+within it: a. tcc is first compiled using ``mescc``. b. The mes
 libc is recompiled using tcc (``mescc`` has a non-standard ``.a``
-format), including some additions for later programs. c. tcc 0.9.26 is
+format), including some additions for later programs. c. tcc is
 recompiled 3 times to add new features, namely ``long long`` and
 ``float``. Each time, the libc is also recompiled.
 
@@ -239,7 +239,7 @@ tinycc 0.9.27
 =============
 
 Now, we compile upstream tcc 0.9.27, the latest release of tinycc, using
-the final version of tcc 0.9.26.
+the final version of the bootsappable tcc.
 
 From this point onwards, until further notice, all programs are compiled
 using tinycc 0.9.27.
@@ -416,7 +416,7 @@ tcc 0.9.27 (musl)
 =================
 
 We recompile ``tcc`` against musl. This is a two stage process. First we
-build tcc-0.9.27 using tcc-0.9.26  that itself links to Mes C library but produces
+build tcc-0.9.27 using tcc-boot-0.9.27  that itself links to Mes C library but produces
 binaries linked to musl. Then we recompile newly produced tcc with
 itself. Interestingly, tcc-0.9.27 linked against musl is self hosting.
 

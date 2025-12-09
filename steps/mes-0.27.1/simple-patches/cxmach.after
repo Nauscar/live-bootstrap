@@ -1,0 +1,2 @@
+  (write-lalr-actions c99cx-mach (mdir "c99cx-act.scm") #:prefix "c99cx-")
+  (write-lalr-tables c99cx-mach (mdir "c99cx-tab.scm") #:prefix "c99cx-"))

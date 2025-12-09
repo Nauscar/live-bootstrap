@@ -1,0 +1,5 @@
+  (write-lalr-actions c99cx-mach (mdir "c99cx-act.scm.new") #:prefix "c99cx-")
+  (write-lalr-tables c99cx-mach (mdir "c99cx-tab.scm.new") #:prefix "c99cx-")
+  (let ((a (move-if-changed (mdir "c99cx-act.scm.new") (mdir "c99cx-act.scm")))
+        (b (move-if-changed (mdir "c99cx-tab.scm.new") (mdir "c99cx-tab.scm"))))
+    (or a b)))

@@ -10,16 +10,37 @@ src_prepare() {
 }
 
 src_compile() {
-    # We first have to recompile using tcc-0.9.26 as tcc-0.9.27 is not self-hosting,
+    if match ${ARCH} aarch64; then
+        TCC_TARGET_ARCH=ARM64
+        LIB_ARM64=true
+    fi
+    if match ${ARCH} amd64; then
+        TCC_TARGET_ARCH=X86_64
+        LIB_ARM64=false
+    fi
+    if match ${ARCH} riscv32; then
+        TCC_TARGET_ARCH=RISCV32
+        LIB_ARM64=false
+    fi
+    if match ${ARCH} riscv64; then
+        TCC_TARGET_ARCH=RISCV64
+        LIB_ARM64=true
+    fi
+    if match ${ARCH} x86; then
+        TCC_TARGET_ARCH=I386
+        LIB_ARM64=false
+    fi
+
+    # We first have to recompile using tcc-boot as tcc-0.9.27 is not self-hosting,
     # but when linked with musl it is.
     ln -sf "${PREFIX}/lib/mes/tcc/libtcc1.a" ./libtcc1.a
 
-    for TCC in tcc-0.9.26 ./tcc-musl; do
+    for TCC in tcc-boot ./tcc-musl; do
         "${TCC}" \
             -v \
             -static \
             -o tcc-musl \
-            -D TCC_TARGET_I386=1 \
+            -D TCC_TARGET_${TCC_TARGET_ARCH}=1 \
             -D CONFIG_TCCDIR=\""${LIBDIR}/tcc"\" \
             -D CONFIG_TCC_CRTPREFIX=\""${LIBDIR}"\" \
             -D CONFIG_TCC_ELFINTERP=\"/musl/loader\" \
@@ -36,7 +57,12 @@ src_compile() {
         # libtcc1.a
         rm -f libtcc1.a
         ${TCC} -c -D HAVE_CONFIG_H=1 lib/libtcc1.c
-        ${TCC} -ar cr libtcc1.a libtcc1.o
+        if match ${LIB_ARM64} true; then
+            ${TCC} -c -D HAVE_CONFIG_H=1 lib/lib-arm64.c
+            ${TCC} -ar cr libtcc1.a libtcc1.o lib-arm64.o
+        else
+            ${TCC} -ar cr libtcc1.a libtcc1.o
+        fi
     done
 }
 

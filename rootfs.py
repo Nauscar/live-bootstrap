@@ -270,7 +270,7 @@ print(shutil.which('chroot'))
             '--build-arg=TARGET=' + target_rel,
             '--build-arg=SOURCE_DATE_EPOCH=1',
             '--progress=auto',
-            '--platform=linux/amd64',
+            '--platform=linux/amd64,linux/arm64,linux/i386,linux/riscv64',
             '--target=package',
             '--tag=live-bootstrap-' + arch,
             '.')
