@@ -74,6 +74,8 @@ simple-patch ${NYACC_PKG}/module/nyacc/lalr.scm \
     ../simple-patches/lalr-datum.before ../simple-patches/lalr-datum.after
 simple-patch ${NYACC_PKG}/module/nyacc/lalr.scm \
     ../simple-patches/lalr-macro.before ../simple-patches/lalr-macro.after
+#simple-patch ${NYACC_PKG}/module/nyacc/lang/util.scm \
+#    ../simple-patches/lang-util.before ../simple-patches/lang-util.after
 simple-patch ${NYACC_PKG}/module/nyacc/lang/c99/cppmach.scm \
     ../simple-patches/cppmach.before ../simple-patches/cppmach.after
 simple-patch ${NYACC_PKG}/module/nyacc/lang/c99/cxmach.scm \
